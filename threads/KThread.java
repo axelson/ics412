@@ -45,10 +45,10 @@ public class KThread {
      */
     public KThread() {
 
-	if (currentThread != null) {
+	if (currentThread != null) {    // Not first thread created
 	    tcb = new TCB();
 	}	    
-	else {
+	else { // First thread created
 	    childWaitList = new ArrayList<KThread>();
 	    parentWaitList = new ArrayList<KThread>();
 
