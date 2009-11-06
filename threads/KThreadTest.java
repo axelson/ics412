@@ -20,7 +20,7 @@ public class KThreadTest {
 	
 	public void run() {
 	    for (int i=0; i<upTo; i++) {
-		System.out.println("*** " + name + " looped " + i + " times");
+		//System.out.println("*** " + name + " looped " + i + " times");
 		KThread.yield();
 	    }
 	    System.out.println("*** " + name + " done");

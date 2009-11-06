@@ -1,6 +1,8 @@
 package nachos.threads;
 
 import nachos.machine.*;
+import java.util.List;
+import java.util.*;
 
 /**
  * A KThread is a thread that can be used to execute Nachos kernel code. Nachos
@@ -37,7 +39,6 @@ public class KThread {
 	Lib.assertTrue(currentThread != null);
 	return currentThread;
     }
-    
     /**
      * Allocate a new <tt>KThread</tt>. If this is the first <tt>KThread</tt>,
      * create an idle thread as well.
@@ -48,6 +49,9 @@ public class KThread {
 	    tcb = new TCB();
 	}	    
 	else {
+	    childWaitList = new ArrayList<KThread>();
+	    parentWaitList = new ArrayList<KThread>();
+
 	    readyQueue = ThreadedKernel.scheduler.newThreadQueue(false);
 	    readyQueue.acquire(this);	    
 
@@ -68,6 +72,7 @@ public class KThread {
     public KThread(Runnable target) {
 	this();
 	this.target = target;
+        
     }
 
     /**
@@ -158,6 +163,16 @@ public class KThread {
     private void runThread() {
 	begin();
 	target.run();
+
+        int i;
+        for(i = 0;i < childWaitList.size();i++){
+          if(childWaitList.get(i).compareTo(this) == 0){
+            parentWaitList.get(i).ready();
+            parentWaitList.remove(i);
+            childWaitList.remove(i);
+          }
+        }
+
 	finish();
     }
 
@@ -184,18 +199,18 @@ public class KThread {
     public static void finish() {
 	Lib.debug(dbgThread, "Thread ends:" + currentThread.toString());
 	
-	Machine.interrupt().disable();
+   	Machine.interrupt().disable();
 
 	Machine.autoGrader().finishingCurrentThread();
 
 	Lib.assertTrue(toBeDestroyed == null);
 	toBeDestroyed = currentThread;
 
-
 	currentThread.status = statusFinished;
 
 	sleep();
-    }
+    
+}
 
     /**
      * Relinquish the CPU if any other thread is ready to run. If so, put the
@@ -246,6 +261,7 @@ public class KThread {
 	if (currentThread.status != statusFinished)
 	    currentThread.status = statusBlocked;
 
+        
 	runNextThread();
     }
 
@@ -273,7 +289,17 @@ public class KThread {
      * thread.
      */
     public void join() {
+
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
+        //System.out.println(this.getName());
+	boolean intStatus = Machine.interrupt().disable();
+
+        if(status != statusFinished){
+          childWaitList.add(this);
+          parentWaitList.add(this.currentThread());
+          KThread.sleep();
+       }
+         Machine.interrupt().restore(intStatus);
 
 	Lib.assertTrue(this != currentThread);
 
@@ -458,6 +484,9 @@ public class KThread {
     private int id = numCreated++;
     /** Number of times the KThread constructor was called. */
     private static int numCreated = 0;
+
+    private static List<KThread> childWaitList;
+    private static List<KThread> parentWaitList;
 
     private static ThreadQueue readyQueue = null;
     private static KThread currentThread = null;
