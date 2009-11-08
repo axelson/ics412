@@ -45,8 +45,8 @@ clean:
 	rm -f */*/*.class
 
 doc:
-	mkdir -p ../doc
-	javadoc $(JAVADOCPARAMS) -d ../doc -sourcepath .. $(PACKAGES)
+	mkdir -p doc
+	javadoc $(JAVADOCPARAMS) -d doc -sourcepath .. $(PACKAGES)
 
 test:
 	cd ../test ; gmake
