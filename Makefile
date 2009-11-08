@@ -1,4 +1,4 @@
-JAVADOCPARAMS = -doctitle "Nachos 5.0 Java" -protected \
+JAVADOCPARAMS = -doctitle "Nachos 5.0 Java" -private \
 		-link http://java.sun.com/j2se/1.5.0/docs/api/
 
 machine =	Lib Config Stats Machine TCB \
