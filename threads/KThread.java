@@ -47,11 +47,9 @@ public class KThread {
 
 	if (currentThread != null) {    // Not first thread created
 	    tcb = new TCB();
+            waitingList = ThreadedKernel.scheduler.newThreadQueue(true);
 	}	    
 	else { // First thread created
-	    childWaitList = new ArrayList<KThread>();
-	    parentWaitList = new ArrayList<KThread>();
-
 	    readyQueue = ThreadedKernel.scheduler.newThreadQueue(false);
 	    readyQueue.acquire(this);	    
 
@@ -59,6 +57,8 @@ public class KThread {
 	    tcb = TCB.currentTCB();
 	    name = "main";
 	    restoreState();
+
+            waitingList = ThreadedKernel.scheduler.newThreadQueue(true);
 
 	    createIdleThread();
 	}
@@ -160,19 +160,12 @@ public class KThread {
 	Machine.interrupt().restore(intStatus);
     }
 
+    /**
+     * Causes this thread to run on the CPU.
+     */
     private void runThread() {
 	begin();
 	target.run();
-
-        int i;
-        for(i = 0;i < childWaitList.size();i++){
-          if(childWaitList.get(i).compareTo(this) == 0){
-            parentWaitList.get(i).ready();
-            parentWaitList.remove(i);
-            childWaitList.remove(i);
-          }
-        }
-
 	finish();
     }
 
@@ -198,6 +191,9 @@ public class KThread {
      */
     public static void finish() {
 	Lib.debug(dbgThread, "Thread ends:" + currentThread.toString());
+
+        // Wake threads that have joined the currently running thread
+        currentThread.wakeJoiners();
 	
    	Machine.interrupt().disable();
 
@@ -291,12 +287,10 @@ public class KThread {
     public void join() {
 
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
-        //System.out.println(this.getName());
 	boolean intStatus = Machine.interrupt().disable();
 
-        if(status != statusFinished){
-          childWaitList.add(this);
-          parentWaitList.add(this.currentThread());
+        if(status != statusFinished) {  // Joinee is not finished yet
+          waitingList.waitForAccess(this.currentThread());
           KThread.sleep();
        }
          Machine.interrupt().restore(intStatus);
@@ -437,6 +431,25 @@ public class KThread {
            return priority;
      }
 
+    /**
+     * Wakes threads that have joined the current thread.
+     */
+    public void wakeJoiners() {
+        boolean intStatus = Machine.interrupt().disable();
+        if(false) {
+            System.out.println("Waiting threads...");
+            waitingList.print();
+            System.out.println("... End waiting threads.");
+        }
+        KThread thread = null;
+        do {
+            thread = waitingList.nextThread();
+            if(thread != null) {
+                thread.ready();
+            }
+        } while(thread != null);
+        Machine.interrupt().restore(intStatus);
+    }
 
     /**
      * Tests whether this module is working.
@@ -480,6 +493,9 @@ public class KThread {
     private Runnable target;
     private TCB tcb;
 
+    /** Threads that are joining this thread */
+    private ThreadQueue waitingList = null;
+
     /**
      * Unique identifer for this thread. Used to deterministically compare
      * threads.
@@ -488,12 +504,11 @@ public class KThread {
     /** Number of times the KThread constructor was called. */
     private static int numCreated = 0;
 
-    private static List<KThread> childWaitList;
-    private static List<KThread> parentWaitList;
-
     private static ThreadQueue readyQueue = null;
+    /** The thread that is currently running */
     private static KThread currentThread = null;
     private static KThread toBeDestroyed = null;
+    /** Thread that runs when all other threads are blocked */
     private static KThread idleThread = null;
 
 }
