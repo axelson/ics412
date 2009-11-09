@@ -462,9 +462,12 @@ public class KThread {
     public Object schedulingState = null;
 
     private static final int statusNew = 0;
+    /** Thread is currently waiting for access to the CPU */
     private static final int statusReady = 1;
+    /** Thread is currently running on the CPU */
     private static final int statusRunning = 2;
     private static final int statusBlocked = 3;
+    /** Thread is done executing */
     private static final int statusFinished = 4;
 
     /**
