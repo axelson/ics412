@@ -51,7 +51,7 @@ public class KThreadTest {
    	      System.out.println("*** "+name+" joined with "+thread1.toString());
             }
             /* Joining with the second thread, if non-null */
-	    if (thread1 != null) {
+	    if (thread2 != null) {
    	      System.out.println("*** "+name+" joining with "+thread2.toString());
 	      thread2.join();
    	      System.out.println("*** "+name+" joined with "+thread2.toString());
