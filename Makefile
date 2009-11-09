@@ -34,7 +34,7 @@ PACKAGES := $(patsubst %,nachos.%,$(ALLDIRS))
 
 CLASSFILES := $(foreach dir,$(DIRS),$(patsubst %,nachos/$(dir)/%.class,$($(dir))))
 
-.PHONY: all rmtemp clean doc hwdoc swdoc
+.PHONY: all rmtemp clean doc hwdoc swdoc tags
 
 all: $(CLASSFILES)
 
@@ -52,3 +52,6 @@ test:
 	cd ../test ; gmake
 
 ag:	$(patsubst ../ag/%.java,nachos/ag/%.class,$(wildcard ../ag/*.java))
+
+tags:
+	ctags -R *
