@@ -26,11 +26,19 @@ public class Alarm {
      */
     public void timerInterrupt() {
 	Lib.debug(dbgAlarm,"In Interrupt Handler (time = "+Machine.timer().getTime()+")");
+	
+	//Disable interrupts
 	boolean intStatus = Machine.interrupt().disable();
+	
+	//If there is a task that is waiting, restore it to ready status
 	if (waitThread != null) {
 	  waitThread.ready();
 	}
+	
+	//Restore interrupts
 	Machine.interrupt().restore(intStatus);
+
+	//Current thread yields and context switches
 	KThread.currentThread().yield();
 
     }
@@ -50,19 +58,30 @@ public class Alarm {
      * @see	nachos.machine.Timer#getTime()
      */
     public void waitUntil(long x) {
+	//Sets current thread as waitThread
         waitThread = KThread.currentThread();
+	
+	//Sets wakeTime with x ticks
 	long wakeTime = Machine.timer().getTime() + x;
+	
+	//Disable interrupts
 	boolean intStatus = Machine.interrupt().disable();
+	
+	//Puts task to sleep for x ticks
 	while(wakeTime > Machine.timer().getTime()){
 	  KThread.sleep();
 	}
+
+	//Restores interrupts
 	Machine.interrupt().restore(intStatus);
+	
+	//Sets waitThread as null
 	waitThread = null;
+	
 	// This is a bad busy waiting solution 
 	// long wakeTime = Machine.timer().getTime() + x;
 	// while (wakeTime > Machine.timer().getTime())
 	//    KThread.yield();
-
     }
 
     /**
