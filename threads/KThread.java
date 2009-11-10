@@ -436,11 +436,6 @@ public class KThread {
      */
     public void wakeJoiners() {
         boolean intStatus = Machine.interrupt().disable();
-        if(false) {
-            System.out.println("Waiting threads...");
-            waitingList.print();
-            System.out.println("... End waiting threads.");
-        }
         KThread thread = null;
         do {
             thread = waitingList.nextThread();
