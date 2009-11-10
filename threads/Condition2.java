@@ -22,6 +22,8 @@ public class Condition2 {
      */
     public Condition2(Lock conditionLock) {
         this.conditionLock = conditionLock;
+
+        this.waitingThreads = ThreadedKernel.scheduler.newThreadQueue(true);
     }
 
     /**
@@ -31,10 +33,24 @@ public class Condition2 {
      * automatically reacquire the lock before <tt>sleep()</tt> returns.
      */
     public void sleep() {
+        boolean intStatus = Machine.interrupt().disable();
 
         /* If the current thread doesn't hold the lock, then abort */
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
+        // Add thread to waitingThreads
+        waitingThreads.waitForAccess(KThread.currentThread());
+
+        // Release lock
+        conditionLock.release();
+
+        // Go to sleep
+        KThread.sleep();
+
+        // Get lock upon awakening
+        conditionLock.acquire();
+
+        Machine.interrupt().restore(intStatus);
     }
 
     /**
@@ -43,7 +59,14 @@ public class Condition2 {
      */
     public void wake() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+        boolean intStatus = Machine.interrupt().disable();
 
+        KThread thread = waitingThreads.nextThread();
+        if(thread != null) {
+            thread.ready();
+        }
+
+        Machine.interrupt().restore(intStatus);
     }
 
     /**
@@ -52,7 +75,17 @@ public class Condition2 {
      */
     public void wakeAll() {
         Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+        boolean intStatus = Machine.interrupt().disable();
 
+        /* Wake all threads that are waiting on the condition variable */
+        KThread thread = null;
+        do {
+            thread = waitingThreads.nextThread();
+            if(thread != null) {
+                thread.ready();
+            }
+        } while(thread != null);
+        Machine.interrupt().restore(intStatus);
     }
 
     /**
@@ -64,5 +97,9 @@ public class Condition2 {
 
     private static final char dbgCondition = 'c';
 
+    /** Lock associated with this condition variable */
     private Lock conditionLock;
+
+    /** Threads waiting for this condition to be signaled */
+    private ThreadQueue waitingThreads = null;
 }
