@@ -9,8 +9,6 @@ import nachos.machine.*;
 public class Alarm {
     /**
      * Allocate a new Alarm. Set the machine's timer interrupt handler to this
-     * alarm's callback.
-     *
      * <p><b>Note</b>: Nachos will not function correctly with more than one
      * alarm.
      */
@@ -28,6 +26,11 @@ public class Alarm {
      */
     public void timerInterrupt() {
 	Lib.debug(dbgAlarm,"In Interrupt Handler (time = "+Machine.timer().getTime()+")");
+	boolean intStatus = Machine.interrupt().disable();
+	if (waitThread != null) {
+	  waitThread.ready();
+	}
+	Machine.interrupt().restore(intStatus);
 	KThread.currentThread().yield();
 
     }
@@ -47,6 +50,14 @@ public class Alarm {
      * @see	nachos.machine.Timer#getTime()
      */
     public void waitUntil(long x) {
+        waitThread = KThread.currentThread();
+	long wakeTime = Machine.timer().getTime() + x;
+	boolean intStatus = Machine.interrupt().disable();
+	while(wakeTime > Machine.timer().getTime()){
+	  KThread.sleep();
+	}
+	Machine.interrupt().restore(intStatus);
+	waitThread = null;
 	// This is a bad busy waiting solution 
 	// long wakeTime = Machine.timer().getTime() + x;
 	// while (wakeTime > Machine.timer().getTime())
@@ -62,5 +73,5 @@ public class Alarm {
     }
 
     private static final char dbgAlarm = 'a';
-
+    private KThread waitThread = null;
 }
