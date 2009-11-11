@@ -26,9 +26,7 @@ public class ThreadedKernel extends Kernel {
 	String fileSystemName = Config.getString("ThreadedKernel.fileSystem");
 	if (fileSystemName != null)
 	    fileSystem = (FileSystem) Lib.constructObject(fileSystemName);
-	else if (Machine.stubFileSystem() != null)
-	    fileSystem = Machine.stubFileSystem();
-	else
+	else if (Machine.stubFileSystem() != null) fileSystem = Machine.stubFileSystem(); else
 	    fileSystem = null;
 
 	// start threading

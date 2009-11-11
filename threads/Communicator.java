@@ -55,10 +55,8 @@ public class Communicator {
 	//mutex.acquire();
 	KThread thread = null;
 	thread = speakerQueue.nextThread();
-	if(thread == null){
-	  listenerQueue.waitForAccess(KThread.currentThread());
-	}
-	else {
+	listenerQueue.waitForAccess(KThread.currentThread());
+	if(thread != null){
 	  thread.ready();
 	}
 	//mutex.release();

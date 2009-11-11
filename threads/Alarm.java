@@ -73,7 +73,7 @@ public class Alarm {
 	}
 
 	//Restores interrupts
-	Machine.interrupt().restore(intStatus);
+	//Machine.interrupt().restore(intStatus);
 	
 	//Sets waitThread as null
 	waitThread = null;
