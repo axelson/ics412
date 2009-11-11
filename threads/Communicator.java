@@ -14,6 +14,9 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
+      this.listenerQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+      this.speakerQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+      this.mutex = new Lock();
     }
 
     /**
@@ -27,8 +30,18 @@ public class Communicator {
      * @param   word    the integer to transfer.
      */
     public void speak(int word) {
+	boolean intStatus = Machine.interrupt().disable();
+	//mutex.acquire();
+	KThread thread = null;
+	//mutex.release();
+	while((thread = listenerQueue.nextThread()) == null){
+	  speakerQueue.waitForAccess(KThread.currentThread());
+	  KThread.sleep();
+	}
+	thread.setWord(word);
+	thread.ready();
 
-
+	Machine.interrupt().restore(intStatus);
     }
 
     /**
@@ -38,7 +51,21 @@ public class Communicator {
      * @return  the integer transferred.
      */    
     public int listen() {
-        return -1;
+	boolean intStatus = Machine.interrupt().disable();
+	//mutex.acquire();
+	KThread thread = null;
+	thread = speakerQueue.nextThread();
+	if(thread == null){
+	  listenerQueue.waitForAccess(KThread.currentThread());
+	}
+	else {
+	  thread.ready();
+	}
+	//mutex.release();
+	KThread.sleep();
+
+	Machine.interrupt().restore(intStatus);
+        return KThread.currentThread().getWord();
     }
 
     /**
@@ -47,6 +74,7 @@ public class Communicator {
     public static void selfTest() {
         CommunicatorTest.runTest();
     }
-
-
+  private ThreadQueue listenerQueue;
+  private ThreadQueue speakerQueue;
+  private Lock mutex;
 }

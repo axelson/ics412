@@ -460,6 +460,14 @@ public class KThread {
         KThreadSimpleTest.runTest();
     }
 
+    public void setWord(int word) {
+      this.word = word;
+    }
+    
+    public int getWord() {
+      return this.word;
+    }
+
     private static final char dbgThread = 't';
 
     /**
@@ -506,4 +514,6 @@ public class KThread {
     /** Thread that runs when all other threads are blocked */
     private static KThread idleThread = null;
 
+    /** Used by the lister thread to receive a word */
+    private int word = -1;
 }
