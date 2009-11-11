@@ -317,8 +317,8 @@ public class ConditionTest {
 	
     }
 
-    private static final int maxNumActions = 100;
-    private static final int numProducers = 4;
-    private static final int numConsumers = 10;
+    private static final int maxNumActions = 100000;
+    private static final int numProducers = 10;
+    private static final int numConsumers = 100;
 
 }
