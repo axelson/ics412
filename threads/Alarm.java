@@ -2,6 +2,8 @@ package nachos.threads;
 
 import nachos.machine.*;
 
+import java.util.*;
+
 /**
  * Uses the hardware timer to provide preemption, and to allow threads to sleep
  * until a certain time.
@@ -13,6 +15,8 @@ public class Alarm {
      * alarm.
      */
     public Alarm() {
+	waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+	//waitQueue = new ArrayList<Long>();
 	Machine.timer().setInterruptHandler(new Runnable() {
 		public void run() { timerInterrupt(); }
 	    });
@@ -30,10 +34,19 @@ public class Alarm {
 	//Disable interrupts
 	boolean intStatus = Machine.interrupt().disable();
 	
+	KThread thread;
 	//If there is a task that is waiting, restore it to ready status
-	if (waitThread != null) {
-	  waitThread.ready();
+	while ((thread = waitQueue.nextThread()) != null) {
+	  if (Machine.timer().getTime() >= wakeTime) {
+	    thread.ready();
+	  }
 	}
+
+	//If there is a task that is waiting, restore it to ready status
+	//if (waitThread != null) {
+	  //waitThread.ready();
+	//}
+
 	
 	//Restore interrupts
 	Machine.interrupt().restore(intStatus);
@@ -59,24 +72,23 @@ public class Alarm {
      */
     public void waitUntil(long x) {
 	//Sets current thread as waitThread
-        waitThread = KThread.currentThread();
+        //waitThread = KThread.currentThread();
 	
 	//Sets wakeTime with x ticks
-	long wakeTime = Machine.timer().getTime() + x;
+	wakeTime = Machine.timer().getTime() + x;
 	
 	//Disable interrupts
 	boolean intStatus = Machine.interrupt().disable();
-	
+
 	//Puts task to sleep for x ticks
 	while(wakeTime > Machine.timer().getTime()){
+	  waitQueue.waitForAccess(KThread.currentThread());
 	  KThread.sleep();
 	}
 
 	//Restores interrupts
-	//Machine.interrupt().restore(intStatus);
+	Machine.interrupt().restore(intStatus);
 	
-	//Sets waitThread as null
-	waitThread = null;
 	
 	// This is a bad busy waiting solution 
 	// long wakeTime = Machine.timer().getTime() + x;
@@ -92,5 +104,8 @@ public class Alarm {
     }
 
     private static final char dbgAlarm = 'a';
-    private KThread waitThread = null;
+    //private KThread waitThread = null;
+    private long wakeTime = 0;
+    //private static List<Long> waitQueue;
+    private ThreadQueue waitQueue;
 }
