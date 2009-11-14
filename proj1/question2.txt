@@ -1,0 +1,6 @@
+* When does the Kernel get rid of the TCB for a thread that has completed? Do not answer "at line xxx" or "in method xxx", but in terms of OS events (e.g., "When a new thread is forked", "When interrupts are enabled", "When the ready queue becomes empty")
+* Why is the sleep() method static, while the ready() method isn't?
+** sleep is static because it only makes sense on the currently running thread of which there can only be one.
+** ready is not static because there is no point in calling ready on a thread that is running, it is meant to be called on a thread that is not running.
+* Why is there that call to ready() in the fork() method?
+* At which line in KThread.java is the CPU scheduler called to decide which KThread should be given the CPU?
