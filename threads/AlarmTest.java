@@ -13,7 +13,7 @@ public class AlarmTest {
 	System.out.println("**** Alarm testing begins ****");
 
         Alarm alm = new Alarm();
-	long wakeTime = 5000000;
+	long wakeTime = 600;
 	System.out.println("System will now sleep for " + wakeTime + " ticks...");
 	alm.waitUntil(wakeTime);
 	

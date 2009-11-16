@@ -47,8 +47,8 @@ public class ThreadedKernel extends Kernel {
 	//Semaphore.selfTest();
         //Condition.selfTest();
         //Condition2.selfTest();
-	//Alarm.selfTest();
-	Communicator.selfTest();
+	Alarm.selfTest();
+	//Communicator.selfTest();
     }
     
     /**

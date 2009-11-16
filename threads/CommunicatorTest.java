@@ -155,9 +155,9 @@ public class CommunicatorTest {
     private static final int numRVThreads = 8;
 
     /* Number of RV actions per thread */
-    private static final int howMany = 1000;
+    private static final int howMany = 5;
 
     /* Bounds on delay between attempts to speak/listen */
     private static final int minDelay = 2;
-    private static final int maxDelay = 10;
+    private static final int maxDelay = 1000;
 }

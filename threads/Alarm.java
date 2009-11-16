@@ -36,15 +36,16 @@ public class Alarm {
 	
 	KThread thread;
 	//If there is a task that is waiting, restore it to ready status
-	while ((thread = waitQueue.nextThread()) != null) {
-	  if (Machine.timer().getTime() >= wakeTime) {
+	//while ((thread = waitQueue.nextThread()) != null) {
+	if (Machine.timer().getTime() >= wakeTime) {
+	    thread = waitQueue.nextThread();
 	    thread.ready();
-	  }
 	}
+	//}
 
 	//If there is a task that is waiting, restore it to ready status
 	//if (waitThread != null) {
-	  //waitThread.ready();
+	// waitThread.ready();
 	//}
 
 	
@@ -82,10 +83,10 @@ public class Alarm {
 
 	//Puts task to sleep for x ticks
 	while(wakeTime > Machine.timer().getTime()){
-	  waitQueue.waitForAccess(KThread.currentThread());
-	  KThread.sleep();
+	    waitQueue.waitForAccess(KThread.currentThread());
+	    KThread.sleep();
 	}
-
+	
 	//Restores interrupts
 	Machine.interrupt().restore(intStatus);
 	

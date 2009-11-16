@@ -33,14 +33,14 @@ public class Communicator {
 	boolean intStatus = Machine.interrupt().disable();
 	//mutex.acquire();
 	KThread thread = null;
-	//mutex.release();
 	while((thread = listenerQueue.nextThread()) == null){
-	  speakerQueue.waitForAccess(KThread.currentThread());
-	  KThread.sleep();
+	  this.speakerQueue.waitForAccess(KThread.currentThread());
+       	  KThread.sleep();
 	}
-	thread.setWord(word);
+	buffer = word;
 	thread.ready();
-
+	
+	//mutex.release();
 	Machine.interrupt().restore(intStatus);
     }
 
@@ -52,18 +52,19 @@ public class Communicator {
      */    
     public int listen() {
 	boolean intStatus = Machine.interrupt().disable();
-	//mutex.acquire();
+	
 	KThread thread = null;
+	
 	thread = speakerQueue.nextThread();
-	listenerQueue.waitForAccess(KThread.currentThread());
-	if(thread != null){
-	  thread.ready();
-	}
-	//mutex.release();
-	KThread.sleep();
+	this.listenerQueue.waitForAccess(KThread.currentThread());
 
+	if(thread != null){
+	    thread.ready();
+	}
+	KThread.sleep();
+	
 	Machine.interrupt().restore(intStatus);
-        return KThread.currentThread().getWord();
+        return buffer;
     }
 
     /**
@@ -75,4 +76,5 @@ public class Communicator {
   private ThreadQueue listenerQueue;
   private ThreadQueue speakerQueue;
   private Lock mutex;
+  private int buffer = 0;
 }
