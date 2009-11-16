@@ -15,7 +15,8 @@ public class Alarm {
      * alarm.
      */
     public Alarm() {
-	//waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+        Lib.debug(dbgAlarm, "Creating Alarm" + Machine.timer().getTime());
+        timeCreated = Machine.timer().getTime();
 	waitQueue = new ArrayList<KThread>();
 	timeQueue = new ArrayList<Long>();
 	queueLock = new Lock();
@@ -38,31 +39,19 @@ public class Alarm {
 
         KThread thread;
         //If there is a task that is waiting, restore it to ready status
-        //while ((thread = waitQueue.nextThread()) != null) {
         for (int i = 0; i < waitQueue.size(); i++) {
-            //System.out.println("i="+ i + " waitQueue size="+ waitQueue.size() +" time="+ Machine.timer().getTime() + "timeCreated="+ this.timeCreated);
             if (Machine.timer().getTime() > timeQueue.get(i)) {
-                System.out.println("Waking thread "+ i);
                 waitQueue.get(i).ready();
                 waitQueue.remove(i);
                 timeQueue.remove(i);
             }
-            //thread = waitQueue.nextThread();
-            //thread.ready();
         }
-        //}
-
-        //If there is a task that is waiting, restore it to ready status
-        //if (waitThread != null) {
-        // waitThread.ready();
-        //}
-
 
         //Restore interrupts
         Machine.interrupt().restore(intStatus);
 
-	//Current thread yields and context switches
-	KThread.currentThread().yield();
+        //Current thread yields and context switches
+        KThread.yield();
 
     }
 
@@ -92,9 +81,9 @@ public class Alarm {
 
 	//Puts task to sleep for x ticks
 	waitQueue.add(KThread.currentThread());
+        Lib.debug(dbgAlarm, "Added new task size="+ waitQueue.size() + " timeCreated="+this.timeCreated);
 	timeQueue.add(wakeTime);
-	int i; 
-	//for (i = 0; i < timeQueue.get(i));
+	int i;
 
 	queueLock.release();
 
@@ -112,9 +101,8 @@ public class Alarm {
     }
 
     private static final char dbgAlarm = 'a';
-    //private KThread waitThread = null;
-    //private static List<Long> waitQueue;
     private List<KThread> waitQueue;
     private List<Long> timeQueue;
     private Lock queueLock;
+    private long timeCreated;
 }
