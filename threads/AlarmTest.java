@@ -32,8 +32,7 @@ public class AlarmTest {
                     " (i.e., until time="+
                     (wakeTime+Machine.timer().getTime())+")");
             ThreadedKernel.alarm.waitUntil(wakeTime);
-            System.out.println(name + " is Done Sleeping (time="+ Machine.timer().getTime());
-            //System.out.println(name + " is Done Sleeping");
+            System.out.println(name + " is Done Sleeping (time="+ Machine.timer().getTime() + ")");
         }
 
         String name;
@@ -53,10 +52,9 @@ public class AlarmTest {
         /* Create the threads and fork them*/
         KThread threads[] = new KThread[numAThreads];
         for (int i=0; i < numAThreads; i++) {
-            /* Creating a speaker */
+            /* Creating a AThread */
             threads[i] = new KThread(new AThread("Thread "+ i, rng));
             threads[i].setName("A-Thread #"+i);
-            /* fork() */
             threads[i].fork();
         }
 
@@ -64,11 +62,9 @@ public class AlarmTest {
         System.out.println("**** Alarm testing ends ****");
     }
 
-
-
     private static final int numAThreads = 20;
 
-    /* Bounds on delay between attempts to speak/listen */
+    /* Bounds on delay for sleep */
     private static final int minDelay = 2;
     private static final int maxDelay = 5000;
 }
