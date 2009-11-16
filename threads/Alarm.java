@@ -31,35 +31,35 @@ public class Alarm {
      * that should be run.
      */
     public void timerInterrupt() {
-	Lib.debug(dbgAlarm,"In Interrupt Handler (time = "+Machine.timer().getTime()+")");
-	
-	//Disable interrupts
-	boolean intStatus = Machine.interrupt().disable();
-	
-	KThread thread;
-	//If there is a task that is waiting, restore it to ready status
-	//while ((thread = waitQueue.nextThread()) != null) {
-	if (Machine.timer().getTime() >= wakeTime) {
-	    for (int i = 0; i < waitQueue.size(); i++) {
-	      if (Machine.timer().getTime() > timeQueue.get(i)) {
-	        waitQueue.get(i).ready();
-		waitQueue.remove(i);
-		timeQueue.remove(i);
-	      }
-	    }
-	    //thread = waitQueue.nextThread();
-	    //thread.ready();
-	}
-	//}
+        Lib.debug(dbgAlarm,"In Interrupt Handler (time = "+Machine.timer().getTime()+")");
 
-	//If there is a task that is waiting, restore it to ready status
-	//if (waitThread != null) {
-	// waitThread.ready();
-	//}
+        //Disable interrupts
+        boolean intStatus = Machine.interrupt().disable();
 
-	
-	//Restore interrupts
-	Machine.interrupt().restore(intStatus);
+        KThread thread;
+        //If there is a task that is waiting, restore it to ready status
+        //while ((thread = waitQueue.nextThread()) != null) {
+        for (int i = 0; i < waitQueue.size(); i++) {
+            //System.out.println("i="+ i + " waitQueue size="+ waitQueue.size() +" time="+ Machine.timer().getTime() + "timeCreated="+ this.timeCreated);
+            if (Machine.timer().getTime() > timeQueue.get(i)) {
+                System.out.println("Waking thread "+ i);
+                waitQueue.get(i).ready();
+                waitQueue.remove(i);
+                timeQueue.remove(i);
+            }
+            //thread = waitQueue.nextThread();
+            //thread.ready();
+        }
+        //}
+
+        //If there is a task that is waiting, restore it to ready status
+        //if (waitThread != null) {
+        // waitThread.ready();
+        //}
+
+
+        //Restore interrupts
+        Machine.interrupt().restore(intStatus);
 
 	//Current thread yields and context switches
 	KThread.currentThread().yield();
@@ -83,8 +83,8 @@ public class Alarm {
     public void waitUntil(long x) {
 	//Sets current thread as waitThread
 	
-	//Sets wakeTime with x ticks
-	wakeTime = Machine.timer().getTime() + x;
+	//Initializes wakeTime with x ticks
+	long wakeTime = Machine.timer().getTime() + x;
 	
 	//Disable interrupts
 	boolean intStatus = Machine.interrupt().disable();
@@ -113,7 +113,6 @@ public class Alarm {
 
     private static final char dbgAlarm = 'a';
     //private KThread waitThread = null;
-    private long wakeTime = 0;
     //private static List<Long> waitQueue;
     private List<KThread> waitQueue;
     private List<Long> timeQueue;
