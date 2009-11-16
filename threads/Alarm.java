@@ -15,8 +15,10 @@ public class Alarm {
      * alarm.
      */
     public Alarm() {
-	waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
-	//waitQueue = new ArrayList<Long>();
+	//waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
+	waitQueue = new ArrayList<KThread>();
+	timeQueue = new ArrayList<Long>();
+	queueLock = new Lock();
 	Machine.timer().setInterruptHandler(new Runnable() {
 		public void run() { timerInterrupt(); }
 	    });
@@ -38,8 +40,15 @@ public class Alarm {
 	//If there is a task that is waiting, restore it to ready status
 	//while ((thread = waitQueue.nextThread()) != null) {
 	if (Machine.timer().getTime() >= wakeTime) {
-	    thread = waitQueue.nextThread();
-	    thread.ready();
+	    for (int i = 0; i < waitQueue.size(); i++) {
+	      if (Machine.timer().getTime() > timeQueue.get(i)) {
+	        waitQueue.get(i).ready();
+		waitQueue.remove(i);
+		timeQueue.remove(i);
+	      }
+	    }
+	    //thread = waitQueue.nextThread();
+	    //thread.ready();
 	}
 	//}
 
@@ -73,28 +82,26 @@ public class Alarm {
      */
     public void waitUntil(long x) {
 	//Sets current thread as waitThread
-        //waitThread = KThread.currentThread();
 	
 	//Sets wakeTime with x ticks
 	wakeTime = Machine.timer().getTime() + x;
 	
 	//Disable interrupts
 	boolean intStatus = Machine.interrupt().disable();
+	queueLock.acquire();
 
 	//Puts task to sleep for x ticks
-	while(wakeTime > Machine.timer().getTime()){
-	    waitQueue.waitForAccess(KThread.currentThread());
-	    KThread.sleep();
-	}
+	waitQueue.add(KThread.currentThread());
+	timeQueue.add(wakeTime);
+	int i; 
+	//for (i = 0; i < timeQueue.get(i));
+
+	queueLock.release();
+
+	KThread.sleep();
 	
 	//Restores interrupts
 	Machine.interrupt().restore(intStatus);
-	
-	
-	// This is a bad busy waiting solution 
-	// long wakeTime = Machine.timer().getTime() + x;
-	// while (wakeTime > Machine.timer().getTime())
-	//    KThread.yield();
     }
 
     /**
@@ -108,5 +115,7 @@ public class Alarm {
     //private KThread waitThread = null;
     private long wakeTime = 0;
     //private static List<Long> waitQueue;
-    private ThreadQueue waitQueue;
+    private List<KThread> waitQueue;
+    private List<Long> timeQueue;
+    private Lock queueLock;
 }
