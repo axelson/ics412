@@ -17,12 +17,12 @@ public class Alarm {
     public Alarm() {
         Lib.debug(dbgAlarm, "Creating Alarm" + Machine.timer().getTime());
         timeCreated = Machine.timer().getTime();
-	waitQueue = new ArrayList<KThread>();
-	timeQueue = new ArrayList<Long>();
-	queueLock = new Lock();
-	Machine.timer().setInterruptHandler(new Runnable() {
-		public void run() { timerInterrupt(); }
-	    });
+        waitQueue = new ArrayList<KThread>();
+        timeQueue = new ArrayList<Long>();
+        queueLock = new Lock();
+        Machine.timer().setInterruptHandler(new Runnable() {
+                public void run() { timerInterrupt(); }
+            });
     }
 
     /**
@@ -65,39 +65,39 @@ public class Alarm {
      * (current time) >= (WaitUntil called time)+(x)
      * </blockquote>
      *
-     * @param	x	the minimum number of clock ticks to wait.
+     * @param   x       the minimum number of clock ticks to wait.
      *
-     * @see	nachos.machine.Timer#getTime()
+     * @see     nachos.machine.Timer#getTime()
      */
     public void waitUntil(long x) {
-	//Sets current thread as waitThread
-	
-	//Initializes wakeTime with x ticks
-	long wakeTime = Machine.timer().getTime() + x;
-	
-	//Disable interrupts
-	boolean intStatus = Machine.interrupt().disable();
-	queueLock.acquire();
+        //Sets current thread as waitThread
 
-	//Puts task to sleep for x ticks
-	waitQueue.add(KThread.currentThread());
+        //Initializes wakeTime with x ticks
+        long wakeTime = Machine.timer().getTime() + x;
+
+        //Disable interrupts
+        boolean intStatus = Machine.interrupt().disable();
+        queueLock.acquire();
+
+        //Puts task to sleep for x ticks
+        waitQueue.add(KThread.currentThread());
         Lib.debug(dbgAlarm, "Added new task size="+ waitQueue.size() + " timeCreated="+this.timeCreated);
-	timeQueue.add(wakeTime);
-	int i;
+        timeQueue.add(wakeTime);
+        int i;
 
-	queueLock.release();
+        queueLock.release();
 
-	KThread.sleep();
-	
-	//Restores interrupts
-	Machine.interrupt().restore(intStatus);
+        KThread.sleep();
+
+        //Restores interrupts
+        Machine.interrupt().restore(intStatus);
     }
 
     /**
      * Tests whether this module is working.
      */
     public static void selfTest() {
-	AlarmTest.runTest();
+        AlarmTest.runTest();
     }
 
     private static final char dbgAlarm = 'a';
