@@ -5,7 +5,13 @@ import java.util.Random;
 
 
 /**
- * A Tester for the Alarm class
+ * A Tester for the Alarm class.
+ * We can be sure that this tests the implementation because we create many
+ * threads and we can see that they are woken up after the correct amount of
+ * time has passed. Please note that it is impossible to wake up the thread at
+ * exactly the correct time (since the interrupt handler only runs about every
+ * 500 ticks, so instead threads are just woken up sometime after their time has
+ * passed.
  */
 public class AlarmTest {
     /**
