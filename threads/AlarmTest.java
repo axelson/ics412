@@ -8,16 +8,68 @@ import java.util.Random;
  * A Tester for the Alarm class
  */
 public class AlarmTest {
+    /**
+     * Wait thread class
+     */
+    private static class AThread implements Runnable {
+        AThread(String name, Random rng) {
+            this.name = name;
+            this.rng = rng;
+        }
 
-    public static void runTest() {
-	System.out.println("**** Alarm testing begins ****");
+        /** Method to generate a random number of ticks that
+         * needs to be spent waiting before attempting a 
+         * speak/listen actions. The number of ticks is
+         * generated to be between minDelay and maxDelay, inclusive
+         */
+        private int randomDelay() {
+            return minDelay+rng.nextInt(1+maxDelay - minDelay)-1; 
+        }
 
-        Alarm alm = new Alarm();
-	long wakeTime = 600;
-	System.out.println("System will now sleep for " + wakeTime + " ticks...");
-	alm.waitUntil(wakeTime);
-	
-	System.out.println("**** Alarm testing end ****");
+        public void run() {
+            long wakeTime = randomDelay();
+            System.out.println("** "+name+": Sleeping for "+wakeTime+
+                    " (i.e., until time="+
+                    (wakeTime+Machine.timer().getTime())+")");
+            ThreadedKernel.alarm.waitUntil(wakeTime);
+            System.out.println(name + " is Done Sleeping (time="+ Machine.timer().getTime());
+            //System.out.println(name + " is Done Sleeping");
+        }
+
+        String name;
+        Random rng;
     }
 
+
+    /**
+     * Tests whether this module is working.
+     */
+    public static void runTest() {
+        System.out.println("**** Alarm testing begins ****");
+
+        /* Create a random number generator */
+        Random rng = new Random();
+
+        /* Create the threads and fork them*/
+        KThread threads[] = new KThread[numAThreads];
+        for (int i=0; i < numAThreads; i++) {
+            /* Creating a speaker */
+            threads[i] = new KThread(new AThread("Thread "+ i, rng));
+            threads[i].setName("A-Thread #"+i);
+            /* fork() */
+            threads[i].fork();
+        }
+
+        ThreadedKernel.alarm.waitUntil(6000);
+        System.out.println("**** Alarm testing ends ****");
+    }
+
+
+
+    private static final int numAThreads = 20;
+
+    /* Bounds on delay between attempts to speak/listen */
+    private static final int minDelay = 2;
+    private static final int maxDelay = 5000;
 }
+
