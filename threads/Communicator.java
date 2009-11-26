@@ -16,7 +16,6 @@ public class Communicator {
     public Communicator() {
 	this.listenerQueue = ThreadedKernel.scheduler.newThreadQueue(true);
 	this.speakerQueue = ThreadedKernel.scheduler.newThreadQueue(true);
-	this.mutex = new Lock();
     }
     
     /**
