@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Stack;
 
+import java.util.PriorityQueue;
+import java.util.Comparator;
+
 /**
  * A scheduler that chooses threads based on their priorities.
  *
@@ -181,6 +184,19 @@ public class PriorityScheduler extends Scheduler {
 	 */
 	public boolean transferPriority;
 
+	/**
+	 * Priority Queue
+	 */
+	private java.util.PriorityQueue waitQueue = new java.util.PriorityQueue<KThread>(11, new CompareThreadsByPriority());
+
+
+    }
+
+    /** Class to compare threads */
+    public class CompareThreadsByPriority implements Comparator<KThread> {
+	    public int compare(KThread x, KThread y) {
+		    return 1;
+	    }
     }
 
     /**
