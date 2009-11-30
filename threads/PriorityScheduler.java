@@ -37,54 +37,54 @@ public class PriorityScheduler extends Scheduler {
      */
     public PriorityScheduler() {
     }
-    
+
     /**
      * Allocate a new priority thread queue.
      *
-     * @param	transferPriority	<tt>true</tt> if this queue should
-     *					transfer priority from waiting threads
-     *					to the owning thread.
-     * @return	a new priority thread queue.
+     * @param   transferPriority        <tt>true</tt> if this queue should
+     *                                  transfer priority from waiting threads
+     *                                  to the owning thread.
+     * @return  a new priority thread queue.
      */
     public ThreadQueue newThreadQueue(boolean transferPriority) {
-	return new PriorityQueue(transferPriority);
+        return new PriorityQueue(transferPriority);
     }
 
     /**
      * getPriority()
      */
     public int getPriority(KThread thread) {
-	Lib.assertTrue(Machine.interrupt().disabled());
-		       
-	return getThreadState(thread).getPriority();
+        Lib.assertTrue(Machine.interrupt().disabled());
+
+        return getThreadState(thread).getPriority();
     }
 
     /**
      * getEffectivePriority()
      */
     public int getEffectivePriority(KThread thread) {
-	Lib.assertTrue(Machine.interrupt().disabled());
-		       
-	return getThreadState(thread).getEffectivePriority();
+        Lib.assertTrue(Machine.interrupt().disabled());
+
+        return getThreadState(thread).getEffectivePriority();
     }
 
     /**
      * setPriority()
      */
     public void setPriority(KThread thread, int priority) {
-	Lib.assertTrue(Machine.interrupt().disabled());
-		       
-	Lib.assertTrue(priority >= priorityMinimum &&
-		       priority <= priorityMaximum);
-	
-	getThreadState(thread).setPriority(priority);
+        Lib.assertTrue(Machine.interrupt().disabled());
+
+        Lib.assertTrue(priority >= priorityMinimum &&
+                       priority <= priorityMaximum);
+
+        getThreadState(thread).setPriority(priority);
     }
 
     /**
-     * The self test 
+     * The self test
      */
     public static void selfTest() {
-      PrioritySchedulerTest.runTest(); 
+      PrioritySchedulerTest.runTest();
     }
 
     /**
@@ -98,20 +98,20 @@ public class PriorityScheduler extends Scheduler {
     /**
      * The maximum priority that a thread can have. Do not change this value.
      */
-    public static final int priorityMaximum = 7;    
+    public static final int priorityMaximum = 7;
 
     /**
      * Return the scheduling state of the specified thread.
      *
-     * @param	thread	the thread whose scheduling state to return.
-     * @return	the scheduling state of the specified thread.
+     * @param   thread  the thread whose scheduling state to return.
+     * @return  the scheduling state of the specified thread.
      */
     protected ThreadState getThreadState(KThread thread) {
-	if (thread.schedulingState == null) {
-	    thread.schedulingState = new ThreadState(thread);
+        if (thread.schedulingState == null) {
+            thread.schedulingState = new ThreadState(thread);
         }
 
-	return (ThreadState) thread.schedulingState;
+        return (ThreadState) thread.schedulingState;
     }
 
     /**
@@ -120,30 +120,30 @@ public class PriorityScheduler extends Scheduler {
      * code wherever you see fit and whichever method you see fit.
      */
     protected class PriorityQueue extends ThreadQueue {
-      
-	PriorityQueue(boolean transferPriority) {
-	    this.transferPriority = transferPriority;
 
-	}
+        PriorityQueue(boolean transferPriority) {
+            this.transferPriority = transferPriority;
 
-	/**
+        }
+
+        /**
          * The thread declares its intent to wait for access to the
          * "resource" guarded by this priority queue. This method is only called
          * if the thread cannot immediately obtain access.
          *
-         * @param       thread       The thread 
+         * @param       thread       The thread
          *
          * @see nachos.threads.ThreadQueue#waitForAccess
          */
 
-	public void waitForAccess(KThread thread) {
-	    Lib.assertTrue(Machine.interrupt().disabled());
+        public void waitForAccess(KThread thread) {
+            Lib.assertTrue(Machine.interrupt().disabled());
 
-	}
+        }
 
-        /* print(): Prints the priority queue, for potential debugging 
+        /* print(): Prints the priority queue, for potential debugging
          */
-	public void print() {
+        public void print() {
         }
 
         /**
@@ -151,52 +151,52 @@ public class PriorityScheduler extends Scheduler {
          * <tt>waitForAccess()</tt> or <tt>nextThread()</tt>. Assert that no
          * threads are waiting for access.
          */
-	public void acquire(KThread thread) {
-	    Lib.assertTrue(Machine.interrupt().disabled());
-	}
+        public void acquire(KThread thread) {
+            Lib.assertTrue(Machine.interrupt().disabled());
+        }
 
 
 
         /**
          * Select the next thread in the ThreadQueue
          */
-	public KThread nextThread() {
-	    Lib.assertTrue(Machine.interrupt().disabled());
+        public KThread nextThread() {
+            Lib.assertTrue(Machine.interrupt().disabled());
 
             return null;
-	}
+        }
 
-	/**
-	 * Return the next thread that <tt>nextThread()</tt> would return,
-	 * without modifying the state of this queue.
-	 *
-	 * @return	the next thread that <tt>nextThread()</tt> would
-	 *		return.
-	 */
-	protected KThread pickNextThread() {
+        /**
+         * Return the next thread that <tt>nextThread()</tt> would return,
+         * without modifying the state of this queue.
+         *
+         * @return      the next thread that <tt>nextThread()</tt> would
+         *              return.
+         */
+        protected KThread pickNextThread() {
 
             return null;
-	}
-	
-	/**
-	 * <tt>true</tt> if this queue should transfer priority from waiting
-	 * threads to the owning thread.
-	 */
-	public boolean transferPriority;
+        }
 
-	/**
-	 * Priority Queue
-	 */
-	private java.util.PriorityQueue waitQueue = new java.util.PriorityQueue<KThread>(11, new CompareThreadsByPriority());
+        /**
+         * <tt>true</tt> if this queue should transfer priority from waiting
+         * threads to the owning thread.
+         */
+        public boolean transferPriority;
+
+        /**
+         * Priority Queue
+         */
+        private java.util.PriorityQueue waitQueue = new java.util.PriorityQueue<KThread>(11, new CompareThreadsByPriority());
 
 
     }
 
     /** Class to compare threads */
     public class CompareThreadsByPriority implements Comparator<KThread> {
-	    public int compare(KThread x, KThread y) {
-		    return 1;
-	    }
+            public int compare(KThread x, KThread y) {
+                    return 1;
+            }
     }
 
     /**
@@ -207,52 +207,52 @@ public class PriorityScheduler extends Scheduler {
      * Each scheduler keeps track of scheduler specific KThread information
      * in its own declaration of the ThreadState class.
      *
-     * @see	nachos.threads.KThread#schedulingState
-     */ 
+     * @see     nachos.threads.KThread#schedulingState
+     */
     protected class ThreadState {
 
-	/**
-	 * Allocate a new <tt>ThreadState</tt> object and associate it with the
-	 * specified thread.
-	 *
-	 * @param	thread	the thread this state belongs to.
-	 */
-	public ThreadState(KThread thread) {
-	    this.thread = thread;
+        /**
+         * Allocate a new <tt>ThreadState</tt> object and associate it with the
+         * specified thread.
+         *
+         * @param       thread  the thread this state belongs to.
+         */
+        public ThreadState(KThread thread) {
+            this.thread = thread;
             this.priority = priorityDefault;
-	}
+        }
 
-	/**
-	 * Return the priority of the associated thread.
-	 *
-	 * @return	the priority of the associated thread.
-	 */
-	public int getPriority() {
-	    return priority;
-	}
+        /**
+         * Return the priority of the associated thread.
+         *
+         * @return      the priority of the associated thread.
+         */
+        public int getPriority() {
+            return priority;
+        }
 
-	/**
-	 * Set the priority of the associated thread to the specified value.
-	 *
-	 * @param	priority	the new priority.
-	 */
-	public void setPriority(int priority) {
-	    this.priority = priority;
-	}
+        /**
+         * Set the priority of the associated thread to the specified value.
+         *
+         * @param       priority        the new priority.
+         */
+        public void setPriority(int priority) {
+            this.priority = priority;
+        }
 
-	/**
-	 * Return the effective priority of the associated thread.
-	 *
-	 * @return	the effective priority of the associated thread.
-	 */
-	public int getEffectivePriority() {
+        /**
+         * Return the effective priority of the associated thread.
+         *
+         * @return      the effective priority of the associated thread.
+         */
+        public int getEffectivePriority() {
              return this.priority;
-	}
+        }
 
-	/** The thread with which this object is associated. */	   
-	protected KThread thread;
-	/** The priority of the associated thread. */
-	protected int priority;
+        /** The thread with which this object is associated. */
+        protected KThread thread;
+        /** The priority of the associated thread. */
+        protected int priority;
     }
 
 }
