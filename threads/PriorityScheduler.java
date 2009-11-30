@@ -139,7 +139,7 @@ public class PriorityScheduler extends Scheduler {
         public void waitForAccess(KThread thread) {
             Lib.assertTrue(Machine.interrupt().disabled());
 
-            waitQueue.add(thread);
+            waitQueue.offer(thread);
         }
 
         /* print(): Prints the priority queue, for potential debugging
@@ -169,7 +169,7 @@ public class PriorityScheduler extends Scheduler {
             if (waitQueue.isEmpty())
                 return null;
 
-            return (KThread) waitQueue.remove();
+            return (KThread) waitQueue.poll();
         }
 
         /**
@@ -181,7 +181,7 @@ public class PriorityScheduler extends Scheduler {
          */
         protected KThread pickNextThread() {
 
-            return null;
+          return waitQueue.peek();
         }
 
         /**
