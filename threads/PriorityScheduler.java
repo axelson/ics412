@@ -225,6 +225,7 @@ public class PriorityScheduler extends Scheduler {
         public ThreadState(KThread thread) {
             this.thread = thread;
             this.priority = priorityDefault;
+            this.effectivePriority = this.priority;
         }
 
         /**
@@ -246,18 +247,29 @@ public class PriorityScheduler extends Scheduler {
         }
 
         /**
+         * Set the priority of the associated thread to the specified value.
+         *
+         * @param       effectivePriority        the new effective priority.
+         */
+        public void setEffectivePriority(int effectivePriority) {
+            this.effectivePriority = effectivePriority;
+        }
+
+        /**
          * Return the effective priority of the associated thread.
          *
          * @return      the effective priority of the associated thread.
          */
         public int getEffectivePriority() {
-             return this.priority;
+             return this.effectivePriority;
         }
 
         /** The thread with which this object is associated. */
         protected KThread thread;
         /** The priority of the associated thread. */
         protected int priority;
+        /** The effective priority of the associated thread. */
+        protected int effectivePriority;
     }
 
 }
