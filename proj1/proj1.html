@@ -1,0 +1,201 @@
+<html>
+<head>
+<title>ICS412 - Fall 2009 - Nachos Project #1</title>
+<link REL=stylesheet HREF="../general.css" TYPE="text/css">
+</head>
+
+<body text = "#222222" bgcolor="#eeeeee">
+
+<center> 
+<h2 class="title">
+<b>&nbsp;ICS412 - Fall 2009 -  Nachos Project #1 - </b><br>
+</h2>
+</center>
+
+<b><font face="sans-serif"> Team Project </font></b><br>
+This is a project to do in a team of three students. The motivation
+is that working with somebody is always a good experience, and that
+the project is sufficiently complicated to justify a 3-student team.
+You can divide the work among team members as you wish.  A team can (and
+is encouraged to) engage in <b>general</b> discussions with other teams
+regarding the project, but specific details of a solution, including
+the solution itself, must <b>always</b> be the team's own work. (See
+the statement of Academic Dishonesty on the course's syllabus.) </p>
+
+<b><font face="sans-serif"> What to turn in? </font></b><br> 
+Turn in an archive (.zip, .tar, .tar.gz, .tgz, etc.) that contains:
+<ul>
+<li> The <tt>thread</tt> directory from the Nachos distribution (in which you have modified some of the Java code).
+<li> The top-level <tt>Makefile</tt> file from the Nachos distribution, if you have modified it.
+<li> You answers to Question #2 in a text file.
+</ul>
+The archive must be turned in via e-mail to <a
+href="mailto:henric@hawaii.edu">henric@hawaii.edu</a> <b>and</b> to <a
+href="mailto:altunkay@hawaii.edu">altunkay@hawaii.edu</a> with a subject
+line like "ICS412: PROJ#1" before 11:59PM on the day the project is due.
+</p>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Getting Started with the Nachos Project #1</font></b><br>
+The slides presented and discussed in class are available: 
+<a href="../slides/ics412_proj1.ppt">[PPT]</a>, 
+<a href="../slides/ics412_proj1.pdf">[PDF]</a>.
+
+<hr>
+<p>
+<b><font face="sans-serif"> Downloading and Installing Nachos</font></b><br>
+<ul>
+<li> Download <a href="./nachos-java-proj1.zip">nachos-java-proj1.zip</a> on your system.
+<li> Unpack the archive in whatever directory: <tt>unzip nachos-java-proj1.zip</tt>
+<li> Change directory: <tt>cd nachos/proj1</tt>
+<li> Type <tt>make</tt>
+<li> Verify that Nachos is successfully built by running it: <tt>../bin/nachos</tt>
+  <ul>
+    <li> You should see a "*** Nachos Kernel Successfully Started ***" message.
+  </ul>
+</ul>
+
+In this project you're only adding/modifying source code in the
+<tt>thread</tt> directory. If you add a new source file in that directory,
+then you must (trivially) modify the top-level Makefile and turn it in
+as well.  <b>Do not</b> modify code anywhere else (since you don't turn
+it in).
+
+<p>
+<b>Reading the <a href="http://www-inst.eecs.berkeley.edu/~cs162/sp09/Nachos/walk/">Nachos for Java Walkthrough</a>, and in particular its
+<a href="http://www-inst.eecs.berkeley.edu/~cs162/sp09/Nachos/walk/x170.html">Threads and Scheduling Section</a> is probably a very good idea.</b>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #1: Adding Simple Testing [10pts] </font></b><br>
+
+Implement the <tt>KThreadSimpleTest.java</tt> class (right now it's
+an empty placeholder). That class should create 2 KThread objects and
+start them. Threads should be named <tt>HelloWorldThread-1</tt> and
+<tt>HelloWorkdThread-2</tt>, and should each print "Hello World!" to
+the screen. Do not remove the <tt>KThread.yield()</tt> call in
+<tt>KThreadSimpleTest.java</tt>. It is there so that the machine does
+not halt before the two test threads have a chance to print out
+their message to the console. You can look at other Test classes for
+inspiration.
+
+<p><i>(My solution takes ~45 lines of code, including comments and debug messages, not counting testing)</i>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #2: Reading the Code [8pts] </font></b><br>
+
+Answer the following questions and the code in KThread.java. The goals here is
+for you to read the code and the comments therein.
+<ul>
+
+<li> When does the Kernel get rid of the TCB for a thread that has
+     completed? Do not answer "at line xxx" or "in method xxx", but
+     in terms of OS events (e.g., "When a new thread is forked", "When interrupts
+     are enabled", "When the ready queue becomes empty")
+
+<li> Why is the <tt>sleep()</tt> method static, while the
+     <tt>ready()</tt> method isn't? 
+
+<li> Why is there that call to <tt>ready()</tt> in the <tt>fork()</tt> method?
+
+<li> At which line in KThread.java is the CPU scheduler called to decide
+     which KThread should be given the CPU?
+
+</ul>
+
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #3: Implementing join() [20pts]</font></b><br>
+Implement the <tt>KThread.join()</tt> method. Calling this method
+allows for a thread to block until another thread is done (just like
+<tt>pthread_join()</tt>).  Multiple threads can call <tt>join()</tt> on
+the same thread, and they are all unblocked when that thread terminates.
+Of course, a thread must finish executing normally whether or not it
+is joined.
+<p>
+<i>Hint:</i> To implement join() you need to write code elsewhere in the code.
+When a thread calls join(), it may block. The code to unblock it obviously
+is not in join() but elsewhere in the Kernel. Shouldn't be too hard to figure
+out.
+<p>
+For this question you're given a tester in KThreadTest.java. You can run it by
+uncommenting the call to <tt>KThread.selfTest()</tt> in <tt>ThreadedKernel.java</tt>.
+</i>
+<p><i>(My solution takes ~25 lines of code, including comments and debug messages, not counting testing)</i>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #4: Implementing Condition Variables [40pts]</font></b><br>
+Implement condition variables directly, by using interrupt enable and
+disable to provide atomicity. We have provided a sample implementation
+that uses semaphores; your job is to provide an equivalent implementation
+without directly using semaphores (you may of course still use locks,
+even though they indirectly use semaphores). Once you are done, you
+will have two alternative implementations that provide the exact same
+functionality. Your second implementation of condition variables must
+reside in class <tt>nachos.threads.Condition2</tt>.
+<p>
+For this question you're given a tester in Condition2Test.java. You can run it by
+uncommenting the call to <tt>Condition2.selfTest()</tt> in <tt>ThreadedKernel.java</tt>.
+
+
+<p><i>(My solution takes ~130 lines of code, including comments and debug messages, not counting testing)</i>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #5: Implementing waitUntil() [30pts]</font></b><br>
+Complete the implementation of the <tt>Alarm</tt> class, by implementing
+the <tt>waitUntil(long x)</tt> method. A thread calls <tt>waitUntil()</tt>
+to suspend its own execution until time has advanced to at least now +
+x. This is useful for threads that operate in real-time, for example, for
+blinking the cursor once per second. There is no requirement that threads
+start running immediately after waking up; just put them on the ready
+queue in the timer interrupt handler after they have waited for at least
+the right amount of time. Do not fork any additional threads to implement
+<tt>waitUntil()</tt>; you need only modify <tt>waitUntil()</tt> and the
+timer interrupt handler. <tt>waitUntil()</tt> is not limited to one thread;
+any number of threads may call it and be suspended at any one time.
+<p>
+For this question you're have to develop a tester, following the model
+of the other testers, and explain how your tester does indeed provide
+confidence that implementation of <tt>waitUntil()</tt> works. (Worth 10pts).
+
+<p><i>(My solution, not counting the tester, takes ~50 lines of code, including comments and debug messages, not counting testing)</i>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #6: Implementing Rendez-Vous [40pts]</font></b><br>
+Implement synchronous send and receive of one word messages (also
+known as rendez-vous), using condition variables (do NOT use
+semaphores!). Implement the <tt>Communicator</tt> class with the following
+two operations:
+<ul>
+<li> <tt> void speak(int word)</tt>, and
+<li> <tt> int listen()</tt>.  
+</ul>
+<tt>speak()</tt> atomically waits until <tt>listen()</tt> is called on
+the same <tt>Communicator</tt> object, and then transfers the word over to
+<tt>listen()</tt>. Once the transfer is made, both can return. Similarly,
+<tt>listen()</tt> waits until <tt>speak()</tt> is called, at which point
+the transfer is made, and both can return (<tt>listen()</tt> returns the
+word). Your solution should work even if there are multiple speakers and
+listeners for the same <tt>Communicator</tt> (note: this is equivalent to
+a zero-length bounded buffer; since the buffer has no room, the producer
+and consumer must interact directly, requiring that they wait for one
+another). Each communicator should only use exactly one lock. If you're
+using more than one lock, you're making things too complicated.
+<p>
+For this question you're given a tester in CommunicatorTest.java. You can run it by
+uncommenting the call to <tt>Communicator.selfTest()</tt> in <tt>ThreadedKernel.java</tt>.
+<p>
+<i>(My solution takes ~125 lines of code, including comments and debug messages, not counting testing)</i>
+
+
+<hr>
+<a href="mailto:henric@hawaii.edu">henric@hawaii.edu</a>
+
+
+</html>

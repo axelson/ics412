@@ -1,0 +1,119 @@
+<html>
+<head>
+<title>ICS412 - Fall 2009 - Nachos Project #2</title>
+<link REL=stylesheet HREF="../general.css" TYPE="text/css">
+</head>
+
+<body text = "#222222" bgcolor="#eeeeee">
+
+<center> 
+<h2 class="title">
+<b>&nbsp;ICS412 - Fall 2009 -  Nachos Project #2 - </b><br>
+</h2>
+</center>
+
+<b><font face="sans-serif"> Team Project </font></b><br>
+This is a project to do in a team of three students. The motivation
+is that working with somebody is always a good experience, and that
+the project is sufficiently complicated to justify a 3-student team.
+You can divide the work among team members as you wish.  A team can (and
+is encouraged to) engage in <b>general</b> discussions with other teams
+regarding the project, but specific details of a solution, including
+the solution itself, must <b>always</b> be the team's own work. (See
+the statement of Academic Dishonesty on the course's syllabus.) </p>
+
+<b><font face="sans-serif"> What to turn in? </font></b><br> 
+Turn in three files
+<ul>
+<li> A text/pdf file with answers to specific question below
+<li> Your PriorityScheduler.java file
+</ul>
+The above must be turned in via e-mail to 
+<a href="mailto:henric@hawaii.edu">henric@hawaii.edu</a> <b>and</b> to <a
+href="mailto:altunkay@hawaii.edu">altunkay@hawaii.edu</a> with a subject
+line like "ICS412: PROJ#2" before 11:59PM on the day the project is due.
+</p>
+
+<hr>
+<p>
+<b><font face="sans-serif"> Getting Started with the Nachos Project #2</font></b><br>
+The slides presented and discussed in class are available: 
+<a href="../slides/ics412_proj2.ppt">[PPT]</a>, 
+<a href="../slides/ics412_proj2.pdf">[PDF]</a>.
+
+<hr>
+<p>
+<b><font face="sans-serif"> Downloading and Installing Nachos</font></b><br>
+This is a continuation from Project #1. So you can just keep extending your code. Besides, there
+is little connection between what you did for project #1 and
+for this project. If somehow your code was completely broken,
+then you can use Henri's own solution for Project #1: <a
+href="./nachos-java-proj1-solution.zip">nachos-java-proj1-solution.zip</a> as the
+starting point.
+<p>
+<font color="red">Important:</font></a> Although this is our "Project #2", you still need to cd to the <tt>proj1</tt>
+directory in nachos to make and run.   (This is because I've split a single project into two.)
+
+<p>
+In this project you're only
+adding/modifying source code in the <tt>PriorityScheduler.java</tt> file.
+<b>Do not</b> modify code anywhere else (since you don't turn it in).
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #0: Setting the Stage [0pts] </font></b><br>
+
+In this project we're implementing a priority scheduler for Nachos. There
+is already a class called <tt>PriorityScheduler</tt> that's only very
+partially implemented that you need to complete.  There is also a
+<tt>PrioritySchedulerTest</tt> class that has extensive testing. 
+
+<p>
+In order to use your priority scheduler, you will need to change the
+line in <tt>proj1/nachos.conf</tt> that specifies the scheduler class
+to use. The <tt>ThreadedKernel.scheduler</tt> key is initially equal to
+<tt>nachos.threads.RoundRobinScheduler</tt>. You need to change this
+to <tt>nachos.threads.PriorityScheduler</tt> when you're ready to run
+Nachos with priority scheduling.
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #1: A Priority Scheduler [30pts] </font></b><br>
+
+Implement a priority scheduler that, when choosing which thread to remove
+from the ready queue to run, always chooses a thread of the highest
+(effective) priority. If multiple threads with the same highest priority
+are waiting, the scheduler should choose the one that has been waiting
+in the queue the longest. Therefore, if there are, say, only 2 threads with equal priority in the system, then their execution will be interleaved across the
+avialable time slices.
+<p>
+The first test in <tt>PrioritySchedulerTest</tt> tests the basic
+capability of the scheduler. When you run it, it prints a description of
+what it does. All other tests deal with Question #2, so you can comment
+them out in <tt>PrioritySchedulerTest.java</tt>.
+
+<hr>
+<p>
+<b><font face="sans-serif"> Question #2: Priority Donation [30pts] </font></b><br>
+
+Enhance your scheduler from Question #1 so that it deals with the Priority
+Inversion problem (via so-called priority donation).  <p> Tests #2, #3,
+and #4 in <tt>PrioritySchedulerTest</tt> test the priority donation
+feature of your scheduler. Each of them corresponds to an additional
+level of sophistication. A good solution will not care and work for all
+of them. But we're making allowances here, allowing a weak solution that
+still work on simple cases to earn you some points (10 points for each
+successfully passed test).
+<p>
+<b>Important: </b>
+It is important that you do not break the abstraction barriers while
+doing this part -- the Lock class does not need to be modified. Priority
+donation should be accomplished by creating a subclass of ThreadQueue that
+will accomplish priority donation when used with the existing Lock class.
+
+
+<hr>
+<a href="mailto:henric@hawaii.edu">henric@hawaii.edu</a>
+
+
+</html>
