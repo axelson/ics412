@@ -200,7 +200,6 @@ public class PriorityScheduler extends Scheduler {
     public class CompareThreadsByPriority implements Comparator<KThread> {
       public int compare(KThread x, KThread y) {
         return x.getPriority() - y.getPriority();
-        //return 1;
       }
     }
 
