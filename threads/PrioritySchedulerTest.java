@@ -41,7 +41,7 @@ public class PrioritySchedulerTest {
           */
 	public void run() {
 
-          System.out.println("** "+name+" begins");
+          System.out.println("** "+name+" begins, priority="+ KThread.currentThread().getPriority());
 
 	  /* Allocate a random number generator */
 	  Random rng = new Random();
@@ -76,6 +76,7 @@ public class PrioritySchedulerTest {
               }
 
 	      /* Update the target's priority */
+              System.out.println("");
               System.out.println(target.getName()+"'s priority changed from "+
                                  oldPriority+" to "+newPriority);
               target.setPriority(newPriority);
