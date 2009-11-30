@@ -181,7 +181,7 @@ public class PriorityScheduler extends Scheduler {
          */
         protected KThread pickNextThread() {
 
-          return waitQueue.peek();
+          return (KThread) waitQueue.peek();
         }
 
         /**
