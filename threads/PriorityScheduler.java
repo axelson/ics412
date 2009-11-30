@@ -139,6 +139,7 @@ public class PriorityScheduler extends Scheduler {
         public void waitForAccess(KThread thread) {
             Lib.assertTrue(Machine.interrupt().disabled());
 
+            waitQueue.add(thread);
         }
 
         /* print(): Prints the priority queue, for potential debugging
@@ -153,6 +154,8 @@ public class PriorityScheduler extends Scheduler {
          */
         public void acquire(KThread thread) {
             Lib.assertTrue(Machine.interrupt().disabled());
+
+            Lib.assertTrue(waitQueue.isEmpty());
         }
 
 
@@ -163,7 +166,10 @@ public class PriorityScheduler extends Scheduler {
         public KThread nextThread() {
             Lib.assertTrue(Machine.interrupt().disabled());
 
-            return null;
+            if (waitQueue.isEmpty())
+                return null;
+
+            return (KThread) waitQueue.remove();
         }
 
         /**
@@ -184,9 +190,7 @@ public class PriorityScheduler extends Scheduler {
          */
         public boolean transferPriority;
 
-        /**
-         * Priority Queue
-         */
+        /** Priority Queue to hold threads. Returns them based on priority */
         private java.util.PriorityQueue waitQueue = new java.util.PriorityQueue<KThread>(11, new CompareThreadsByPriority());
 
 
