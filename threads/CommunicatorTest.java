@@ -68,22 +68,22 @@ public class CommunicatorTest {
                 System.out.println("** "+name+": Done sleeping! (time="+
                         Machine.timer().getTime()+")");
 
-     //           if (isSpeaker) {
-     //               /* I am a speaker and I speak my word */
-     //               int randomWord = randomWord();
-     //               System.out.println("** "+name+": Speaking "+randomWord+
-     //                       " (time="+Machine.timer().getTime()+")");
-     //               comm.speak(randomWord);
-     //               System.out.println("** "+name+": Spoke and Returned (time="+
-     //                       Machine.timer().getTime()+")");
-     //           } else {
-     //               /* I am a listener and I listen */
-     //               System.out.println("** "+name+": Listening (time="+
-     //                       Machine.timer().getTime()+")");
-     //               int word = comm.listen();
-     //               System.out.println("** "+name+": Listened and got "+word+
-     //                       " (time="+Machine.timer().getTime()+")");
-     //           }
+                if (isSpeaker) {
+                    /* I am a speaker and I speak my word */
+                    int randomWord = randomWord();
+                    System.out.println("** "+name+": Speaking "+randomWord+
+                            " (time="+Machine.timer().getTime()+")");
+                    comm.speak(randomWord);
+                    System.out.println("** "+name+": Spoke and Returned (time="+
+                            Machine.timer().getTime()+")");
+                } else {
+                    /* I am a listener and I listen */
+                    System.out.println("** "+name+": Listening (time="+
+                            Machine.timer().getTime()+")");
+                    int word = comm.listen();
+                    System.out.println("** "+name+": Listened and got "+word+
+                            " (time="+Machine.timer().getTime()+")");
+                }
             }
 
             /* Exits and signals it to the main thread */
@@ -158,6 +158,6 @@ public class CommunicatorTest {
     private static final int howMany = 5;
 
     /* Bounds on delay between attempts to speak/listen */
-    private static final int minDelay = 1000;
+    private static final int minDelay = 10000;
     private static final int maxDelay = 1000000;
 }
