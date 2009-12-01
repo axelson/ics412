@@ -126,6 +126,10 @@ public class PriorityScheduler extends Scheduler {
 
         }
 
+        /**
+         * Tests if <tt>PriorityQueue</tt> enables priority transfer
+         * @return  True if <tt>PriorityQueue</tt> has enabled priority transfer
+         */
         public boolean transferPriority() {
           return this.transferPriority;
         }
@@ -143,39 +147,7 @@ public class PriorityScheduler extends Scheduler {
         public void waitForAccess(KThread thread) {
             Lib.assertTrue(Machine.interrupt().disabled());
 
-            //this.transferPriority = true;
-            //System.out.println("transferPriority is "+ this.transferPriority);
-
-            // if transferPriority is true, then do priority donation
-            if(this.transferPriority) {
-              int currentThreadPriority = KThread.currentThread().getPriority();
-              //if(thread.getPriority() != 6) {
-              if(false) {
-                System.out.println("Current: "+ currentThreadPriority +" other: "+ thread.getPriority() + " cname: "+ KThread.currentThread().getName() + " oname: "+ thread.getName());
-                if(pickNextThread() != null) {
-                  System.out.println("Top: "+ pickNextThread().getPriority());
-                }
-                if(currentOwner != null) {
-                  System.out.println("CurrentOwner: "+ currentOwner.getPriority());
-                }
-                System.out.println("");
-              }
-              CompareThreadsByPriority c = new CompareThreadsByPriority();
-              if(currentOwner != null) {
-                if(c.compare(thread, currentOwner) < 0) {
-                  System.out.println("donating priority");
-                  //getThreadState(currentOwner).setEffectivePriority(thread.getPriority());
-                  //currentOwner.setEffectivePriority(currentOwner, thread.getPriority());
-                  //getThreadState(currentOwner).addWaitingThread(thread);
-                } else {
-                  //System.out.println("no donation");
-                }
-              }
-              waitQueue.offer(thread);
-            } else {
-              //System.out.println("donation disabled");
-              waitQueue.offer(thread);
-            }
+            waitQueue.offer(thread);
         }
 
         /* print(): Prints the priority queue, for potential debugging
@@ -215,26 +187,19 @@ public class PriorityScheduler extends Scheduler {
         public KThread nextThread() {
             Lib.assertTrue(Machine.interrupt().disabled());
 
-            //System.out.println("nextThread runs");
-            int currentThreadPriority = KThread.currentThread().getPriority();
-            if((currentThreadPriority != 6) && false) {
-            System.out.println("Current: "+ currentThreadPriority +" cname: "+ KThread.currentThread().getName()
-                + " effective: "+ getThreadState(KThread.currentThread()).getEffectivePriority()
-                );
-            }
-
+            /* Current owner is releasing this resource, so remove this resource from the owners list of resources */
             if(currentOwner != null) {
               getThreadState(currentOwner).removeResource(this);
-              //System.out.println("de-elevating priority");
-              //getThreadState(currentOwner).removeFirstWaitingThread();
             }
 
-            if (waitQueue.isEmpty())
-                return null;
+            if (waitQueue.isEmpty()) {
+              // No one owns this queue any more
+              currentOwner = null;
+            } else {
+              /* Record the new current owner */
+              currentOwner = (KThread) waitQueue.poll();
+            }
 
-            // Reset current owner's priority
-            //getThreadState(currentOwner).setEffectivePriority(currentOwner.getPriority());
-            currentOwner = (KThread) waitQueue.poll();
             return currentOwner;
         }
 
@@ -250,7 +215,10 @@ public class PriorityScheduler extends Scheduler {
           return (KThread) waitQueue.peek();
         }
 
-        /** Lets you know if the queue is empty */
+        /**
+         * Returns true if queue is empty
+         * @return      True if queue is empty
+         */
         public boolean empty() {
           return (this.waitQueue.size() == 0);
         }
@@ -274,7 +242,6 @@ public class PriorityScheduler extends Scheduler {
     public class CompareThreadsByPriority implements Comparator<KThread> {
       public int compare(KThread x, KThread y) {
         return getThreadState(x).getEffectivePriority() - getThreadState(y).getEffectivePriority();
-        //return x.getPriority() - y.getPriority();
       }
     }
 
@@ -340,28 +307,18 @@ public class PriorityScheduler extends Scheduler {
          * @return      the effective priority of the associated thread.
          */
         public int getEffectivePriority() {
-          /*
-          if(waitingThreads.pickNextThread() == null) {
-            return this.getPriority();
-          } else {
-            int effectivePriority = this.waitingThreads.pickNextThread().getPriority();
-            System.out.println(this.thread.getName() + " effective priority elevated: "+ effectivePriority);
-            return effectivePriority;
-          }
-          */
+          // Initialize effective priority to actual priority
           int effectivePriority = this.priority;
+
+          /* Loop over priority queue to find the "highest" priority thread waiting on
+           * the current thread
+           */
           for(PriorityQueue q : this.ownedResources) {
-            if(q.transferPriority()) {
-              if(!q.empty()) {
-                //System.out.println("resource allows priority transfer from "+
-                //    this.getPriority() +
-                //    " to "+ getThreadState(q.pickNextThread()).getEffectivePriority());
-                if(effectivePriority > getThreadState(q.pickNextThread()).getEffectivePriority()) {
-                  effectivePriority = getThreadState(q.pickNextThread()).getEffectivePriority();
-                }
+            // Only transfer priority if this queue allows priority to be transferred
+            if(q.transferPriority() && !q.empty()) {
+              if(effectivePriority > getThreadState(q.pickNextThread()).getEffectivePriority()) {
+                effectivePriority = getThreadState(q.pickNextThread()).getEffectivePriority();
               }
-            } else {
-              System.out.println("resource doesn't allow priority transfer");
             }
           }
           return effectivePriority;
