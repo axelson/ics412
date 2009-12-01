@@ -216,6 +216,7 @@ public class PrioritySchedulerTest {
             for (int i=0; i < locks.length; i++) {
               System.out.println(this.name+" trying to acquire "+
                                  locks[i].getName());
+              System.out.println(this.name+" priority="+ this.priority);
               locks[i].acquire();
               System.out.println(this.name+" has acquired "+
                                     locks[i].getName());
