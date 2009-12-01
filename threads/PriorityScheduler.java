@@ -240,6 +240,11 @@ public class PriorityScheduler extends Scheduler {
           return (KThread) waitQueue.peek();
         }
 
+        /** Lets you know if the queue is empty */
+        public boolean empty() {
+          return (this.waitQueue.size() == 0);
+        }
+
         /**
          * <tt>true</tt> if this queue should transfer priority from waiting
          * threads to the owning thread.
