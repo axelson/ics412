@@ -126,6 +126,10 @@ public class PriorityScheduler extends Scheduler {
 
         }
 
+        public boolean transferPriority() {
+          return this.transferPriority;
+        }
+
         /**
          * The thread declares its intent to wait for access to the
          * "resource" guarded by this priority queue. This method is only called
@@ -162,7 +166,7 @@ public class PriorityScheduler extends Scheduler {
                   System.out.println("donating priority");
                   //getThreadState(currentOwner).setEffectivePriority(thread.getPriority());
                   //currentOwner.setEffectivePriority(currentOwner, thread.getPriority());
-                  getThreadState(currentOwner).addWaitingThread(thread);
+                  //getThreadState(currentOwner).addWaitingThread(thread);
                 } else {
                   //System.out.println("no donation");
                 }
@@ -189,6 +193,8 @@ public class PriorityScheduler extends Scheduler {
 
             Lib.assertTrue(waitQueue.isEmpty());
 
+            getThreadState(thread).addResource(this);
+
             // Record who currently has access to the resource
             currentOwner = thread;
         }
@@ -203,7 +209,7 @@ public class PriorityScheduler extends Scheduler {
 
             //System.out.println("nextThread runs");
             int currentThreadPriority = KThread.currentThread().getPriority();
-            if((currentThreadPriority != 6) && true) {
+            if((currentThreadPriority != 6) && false) {
             System.out.println("Current: "+ currentThreadPriority +" cname: "+ KThread.currentThread().getName()
                 + " effective: "+ getThreadState(KThread.currentThread()).getEffectivePriority()
                 );
@@ -215,8 +221,8 @@ public class PriorityScheduler extends Scheduler {
             // Reset current owner's priority
             //getThreadState(currentOwner).setEffectivePriority(currentOwner.getPriority());
             if(currentOwner != null) {
-              System.out.println("de-elevating priority");
-              getThreadState(currentOwner).removeFirstWaitingThread();
+              //System.out.println("de-elevating priority");
+              //getThreadState(currentOwner).removeFirstWaitingThread();
             }
             currentOwner = (KThread) waitQueue.poll();
             return currentOwner;
@@ -278,7 +284,6 @@ public class PriorityScheduler extends Scheduler {
         public ThreadState(KThread thread) {
             this.thread = thread;
             this.priority = priorityDefault;
-            this.waitingThreads = new PriorityQueue(true);
             this.ownedResources = new LinkedList();
         }
 
@@ -301,17 +306,10 @@ public class PriorityScheduler extends Scheduler {
         }
 
         /**
-         * Adds a thread to the list of waiting threads.
+         * Adds resource to list of owned resources
          */
-        public void addWaitingThread(KThread thread) {
-          this.waitingThreads.waitForAccess(thread);
-        }
-
-        /**
-         * Remove first waiting thread
-         */
-        public KThread removeFirstWaitingThread() {
-          return this.waitingThreads.nextThread();
+        public void addResource(PriorityQueue resource) {
+          this.ownedResources.add(resource);
         }
 
         /**
@@ -320,6 +318,7 @@ public class PriorityScheduler extends Scheduler {
          * @return      the effective priority of the associated thread.
          */
         public int getEffectivePriority() {
+          /*
           if(waitingThreads.pickNextThread() == null) {
             return this.getPriority();
           } else {
@@ -327,6 +326,15 @@ public class PriorityScheduler extends Scheduler {
             System.out.println(this.thread.getName() + " effective priority elevated: "+ effectivePriority);
             return effectivePriority;
           }
+          */
+          for(PriorityQueue q : this.ownedResources) {
+            if(q.transferPriority()) {
+              System.out.println("resource allows priority transfer");
+            } else {
+              System.out.println("resource doesn't allow priority transfer");
+            }
+          }
+          return this.priority;
              //return this.effectivePriority;
         }
 
@@ -336,8 +344,8 @@ public class PriorityScheduler extends Scheduler {
         /** The priority of the associated thread. */
         protected int priority;
 
-        /** Threads waiting on this thread */
-        protected PriorityQueue waitingThreads;
+        /** List of resource owned by this thread */
+        protected LinkedList<PriorityQueue> ownedResources;
     }
 
 }
