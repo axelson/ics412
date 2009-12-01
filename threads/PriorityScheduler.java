@@ -332,15 +332,22 @@ public class PriorityScheduler extends Scheduler {
             return effectivePriority;
           }
           */
+          int effectivePriority = this.priority;
           for(PriorityQueue q : this.ownedResources) {
             if(q.transferPriority()) {
-              System.out.println("resource allows priority transfer");
+              if(!q.empty()) {
+                System.out.println("resource allows priority transfer from "+
+                    this.getPriority() +
+                    " to "+ getThreadState(q.pickNextThread()).getEffectivePriority());
+                if(effectivePriority > getThreadState(q.pickNextThread()).getEffectivePriority()) {
+                  effectivePriority = getThreadState(q.pickNextThread()).getEffectivePriority();
+                }
+              }
             } else {
               System.out.println("resource doesn't allow priority transfer");
             }
           }
-          return this.priority;
-             //return this.effectivePriority;
+          return effectivePriority;
         }
 
         /** The thread with which this object is associated. */
