@@ -215,15 +215,17 @@ public class PriorityScheduler extends Scheduler {
                 );
             }
 
+            if(currentOwner != null) {
+              getThreadState(currentOwner).removeResource(this);
+              //System.out.println("de-elevating priority");
+              //getThreadState(currentOwner).removeFirstWaitingThread();
+            }
+
             if (waitQueue.isEmpty())
                 return null;
 
             // Reset current owner's priority
             //getThreadState(currentOwner).setEffectivePriority(currentOwner.getPriority());
-            if(currentOwner != null) {
-              //System.out.println("de-elevating priority");
-              //getThreadState(currentOwner).removeFirstWaitingThread();
-            }
             currentOwner = (KThread) waitQueue.poll();
             return currentOwner;
         }
@@ -315,6 +317,13 @@ public class PriorityScheduler extends Scheduler {
          */
         public void addResource(PriorityQueue resource) {
           this.ownedResources.add(resource);
+        }
+
+        /**
+         * Remove a resource. Returns true if it sucessfully removes
+         */
+        public boolean removeResource(PriorityQueue resource) {
+          return this.ownedResources.remove(resource);
         }
 
         /**
