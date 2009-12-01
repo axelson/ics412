@@ -530,13 +530,13 @@ public class PrioritySchedulerTest {
         //runPingPongTest();
 
 	/* Simplest priority donation test */
-        runPriorityDonationTest1();
+        //runPriorityDonationTest1();
 
 	/*  More sophisticated donation test */
-        //runPriorityDonationTest2();
+        runPriorityDonationTest2();
 
 	/*  Complex donation test */
-        //runPriorityDonationTest3();
+        runPriorityDonationTest3();
 
 	System.out.println("####################################");
 	System.out.println("## PriorityScheduler testing ends ##");
