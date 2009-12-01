@@ -145,11 +145,19 @@ public class PriorityScheduler extends Scheduler {
         /* print(): Prints the priority queue, for potential debugging
          */
         public void print() {
+	  System.out.println("***Printing waitQueue***");
+	  Iterator itr = waitQueue.iterator();
+	  int i = 0;
+	  while (itr.hasNext()) {
+	    KThread thread = (KThread)itr.next();
+	    System.out.println(i + ":\t" + thread.getName());
+	    i++;
+	  }
         }
 
         /**
-         * The specified thread has received exclusive access, without using
-         * <tt>waitForAccess()</tt> or <tt>nextThread()</tt>. Assert that no
+	 * The specified thread has received exclusive access, without using
+	 * <tt>waitForAccess()</tt> or <tt>nextThread()</tt>. Assert that no
          * threads are waiting for access.
          */
         public void acquire(KThread thread) {
